@@ -1,8 +1,12 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import List
 import logging
+import os
+from pathlib import Path
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -35,6 +39,10 @@ llm_clients = LLMClients()
 # Initialize database
 db.init_db()
 logger.info("Database initialized")
+
+# Serve React build files
+if os.path.exists("frontend/build"):
+    app.mount("/static", StaticFiles(directory="frontend/build/static"), name="static")
 
 
 # Pydantic models
@@ -96,15 +104,11 @@ async def generate_jokes(request: JokeRequest):
 
         jokes = await asyncio.gather(*tasks)
 
-        import random
-        models = ['OpenAI', 'Anthropic', 'Gemini', 'Llama']
-        joke_model_pairs = list(zip(jokes, models))
-        random.shuffle(joke_model_pairs)
-        logger.info(f"🎲 RANDOMIZED ORDER!")
-
         # Format response
         response = []
-        for i, (joke, model) in enumerate(joke_model_pairs):
+        models = ['OpenAI', 'Anthropic', 'Gemini', 'Llama']
+
+        for i, (joke, model) in enumerate(zip(jokes, models)):
             response.append(JokeResponse(
                 id=i,
                 content=joke,
@@ -212,6 +216,21 @@ async def get_scores():
     except Exception as e:
         logger.error(f"Error in get_scores: {e}")
         raise HTTPException(status_code=500, detail="Failed to get scores")
+
+
+# Serve React app for all non-API routes
+@app.get("/{full_path:path}")
+async def serve_react_app(full_path: str):
+    """Serve React app for all non-API routes"""
+    # Don't serve React for API routes
+    if full_path.startswith("api/") or full_path.startswith("debug/"):
+        raise HTTPException(status_code=404, detail="API route not found")
+
+    # Serve React index.html for all other routes
+    if os.path.exists("frontend/build/index.html"):
+        return FileResponse("frontend/build/index.html")
+    else:
+        return {"message": "React app not built yet. Run: cd frontend && npm run build"}
 
 
 if __name__ == "__main__":

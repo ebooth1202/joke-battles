@@ -1,1 +1,2 @@
-web: uvicorn app:app --host 0.0.0.0 --port $PORT
+release: chmod +x build.sh && ./build.sh
+web: cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT
