@@ -237,6 +237,25 @@ async def serve_react_app(full_path: str):
         return {"message": "React app not built yet. Run: cd frontend && npm run build"}
 
 
+@app.post("/debug/reset-database")
+async def reset_database():
+    """Reset the database (remove this endpoint after use!)"""
+    try:
+        # Clear all votes
+        import sqlite3
+        conn = sqlite3.connect('votes.db')
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM votes")
+        conn.commit()
+        conn.close()
+
+        logger.info("Database reset successfully")
+        return {"message": "Database cleared successfully"}
+    except Exception as e:
+        logger.error(f"Error resetting database: {e}")
+        return {"error": str(e)}
+
+
 if __name__ == "__main__":
     import uvicorn
 
