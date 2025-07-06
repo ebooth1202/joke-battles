@@ -70,7 +70,11 @@ class ScoreResponse(BaseModel):
 
 @app.get("/")
 async def root():
-    return {"message": "Joke Battles API is running!"}
+    """Serve React app from root"""
+    if os.path.exists("frontend/build/index.html"):
+        return FileResponse("frontend/build/index.html")
+    else:
+        return {"message": "Joke Battles API is running!"}
 
 
 @app.post("/api/generate-jokes", response_model=List[JokeResponse])
