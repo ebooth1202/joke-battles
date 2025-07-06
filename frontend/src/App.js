@@ -14,22 +14,14 @@ const App = () => {
   };
 
   const fetchLeaderboard = async () => {
-    try {
-      const response = await fetch('/api/scores');
+      try {
+        const response = await fetch('/api/scores');
         const data = await response.json();
         setLeaderboard(data);
-
-      // Mock data for now
-      setLeaderboard([
-        { model: 'OpenAI', votes: 247, icon: '🤖' },
-        { model: 'Anthropic', votes: 189, icon: '🎭' },
-        { model: 'Gemini', votes: 156, icon: '⭐' },
-        { model: 'Llama', votes: 134, icon: '🦙' }
-      ]);
-    } catch (error) {
-      console.error('Error fetching leaderboard:', error);
-    }
-  };
+      } catch (error) {
+        console.error('Error fetching leaderboard:', error);
+      }
+    };
 
   useEffect(() => {
     fetchLeaderboard();
