@@ -41,8 +41,8 @@ db.init_db()
 logger.info("Database initialized")
 
 # Serve React build files
-if os.path.exists("frontend/build"):
-    app.mount("/static", StaticFiles(directory="frontend/build/static"), name="static")
+if os.path.exists("../frontend/build"):
+    app.mount("/static", StaticFiles(directory="../frontend/build/static"), name="static")
 
 
 # Pydantic models
@@ -71,8 +71,8 @@ class ScoreResponse(BaseModel):
 @app.get("/")
 async def root():
     """Serve React app from root"""
-    if os.path.exists("frontend/build/index.html"):
-        return FileResponse("frontend/build/index.html")
+    if os.path.exists("../frontend/build/index.html"):
+        return FileResponse("../frontend/build/index.html")
     else:
         return {"message": "Joke Battles API is running!"}
 
@@ -231,8 +231,8 @@ async def serve_react_app(full_path: str):
         raise HTTPException(status_code=404, detail="API route not found")
 
     # Serve React index.html for all other routes
-    if os.path.exists("frontend/build/index.html"):
-        return FileResponse("frontend/build/index.html")
+    if os.path.exists("../frontend/build/index.html"):
+        return FileResponse("../frontend/build/index.html")
     else:
         return {"message": "React app not built yet. Run: cd frontend && npm run build"}
 
