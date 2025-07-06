@@ -1,10 +1,9 @@
 {
   "name": "joke-battles",
   "version": "1.0.0",
-  "description": "AI vs AI: Which model tells the best jokes?",
   "scripts": {
     "build": "cd frontend && npm install && npm run build",
-    "start": "cd backend && python main.py"
+    "heroku-postbuild": "cd frontend && npm install && npm run build"
   },
   "engines": {
     "node": "18.x",
