@@ -14,6 +14,15 @@ const App = () => {
     return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
   };
 
+  const shuffleArray = (array) => {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
+
   const fetchLeaderboard = async () => {
       try {
         const response = await fetch('/api/scores');
@@ -29,35 +38,35 @@ const App = () => {
   }, []);
 
   const handleGenerateJokes = async (context) => {
-    setLoading(true);
-    setVoted(false);
-    setVotedIndex(null);
-    const newSessionId = generateSessionId();
-    setSessionId(newSessionId);
+  setLoading(true);
+  setVoted(false);
+  setVotedIndex(null);
+  const newSessionId = generateSessionId();
+  setSessionId(newSessionId);
 
-    try {
-      const response = await fetch('/api/generate-jokes', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ context, session_id: newSessionId })
-        });
-        const data = await response.json();
+  try {
+    const response = await fetch('/api/generate-jokes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ context, session_id: newSessionId })
+      });
+      const data = await response.json();
 
-        // ADD THESE DEBUG LINES:
-        console.log("API Response:", data);
-        console.log("Setting jokes to:", data);
+      console.log("Original order:", data.map(j => j.model));
 
-        // Shuffle the jokes array to randomize order
-        const shuffledJokes = [...data].sort(() => Math.random() - 0.5);
-        setJokes(shuffledJokes);
-        setLoading(false);
-        console.log("API Response:", data);
+      // Properly shuffle the jokes array
+      const shuffledJokes = shuffleArray(data);
 
-    } catch (error) {
-      console.error('Error generating jokes:', error);
+      console.log("Shuffled order:", shuffledJokes.map(j => j.model));
+
+      setJokes(shuffledJokes);
       setLoading(false);
-    }
-  };
+
+  } catch (error) {
+    console.error('Error generating jokes:', error);
+    setLoading(false);
+  }
+};
 
   const handleVote = async (jokeIndex) => {
     if (voted) return;
@@ -242,7 +251,7 @@ const JokeResults = ({ jokes, voted, votedIndex, onVote, loading }) => {
       }}>
         {jokes.map((joke, index) => (
           <div
-            key={joke.id}
+            key={index}
             style={{
               backgroundColor: 'white',
               border: `3px solid ${voted && index === votedIndex ? '#10B981' : '#1E3A8A'}`,
