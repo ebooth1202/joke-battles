@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import dekDevLogo from './dekdev.png';
 
 // Main App Component
 const App = () => {
@@ -106,6 +107,7 @@ const App = () => {
           />
         )}
         <Scoreboard leaderboard={leaderboard} />
+          <Footer />
       </div>
     </div>
   );
@@ -213,7 +215,7 @@ const JokeForm = ({ onGenerateJokes, loading }) => {
         color: '#6B7280',
         fontSize: '0.9rem'
       }}>
-        Four AI models will compete to make you laugh. Vote for your favorite!
+        Four of the major AI models will compete to make you laugh. Vote for your favorite!
       </p>
     </div>
   );
@@ -421,7 +423,7 @@ const Scoreboard = ({ leaderboard }) => {
                     fontSize: '0.9rem',
                     color: '#6B7280'
                   }}>
-                    {((item.votes / maxVotes) * 100).toFixed(1)}% win rate
+                    {((item.votes / leaderboard.reduce((sum, model) => sum + model.votes, 0)) * 100).toFixed(1)}% win rate
                   </div>
                 </div>
               </div>
@@ -456,5 +458,35 @@ const Scoreboard = ({ leaderboard }) => {
     </div>
   );
 };
+
+// Footer Component
+const Footer = () => (
+  <div style={{
+    textAlign: 'center',
+    padding: '30px 20px',
+    marginTop: '40px',
+    borderTop: '1px solid #93C5FD',
+    backgroundColor: '#E6F3FF'
+  }}>
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '12px',
+      color: '#6B7280',
+      fontSize: '1rem'
+    }}>
+      <span>Brought to you by</span>
+      <img
+        src={dekDevLogo}
+        alt="Dek-Dev"
+        style={{
+          height: '32px',
+          width: 'auto'
+        }}
+      />
+    </div>
+  </div>
+);
 
 export default App;
