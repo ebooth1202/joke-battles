@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import dekDevLogo from './dekdev.png';
+// import dekDevLogo from '../public/dekdev.png';
+
 
 // Main App Component
 const App = () => {
@@ -425,7 +426,7 @@ const Scoreboard = ({ leaderboard }) => {
                     fontSize: '0.9rem',
                     color: '#6B7280'
                   }}>
-                    {((item.votes / leaderboard.reduce((sum, model) => sum + model.votes, 0)) * 100).toFixed(1)}% win rate
+                    {/*{((item.votes / leaderboard.reduce((sum, model) => sum + model.votes, 0)) * 100).toFixed(1)}% win rate*/}
                   </div>
                 </div>
               </div>
@@ -480,7 +481,7 @@ const Footer = () => (
     }}>
       <span>Brought to you by</span>
       <img
-        src={dekDevLogo}
+        src="/dekdev.png"
         alt="Dek-Dev"
         style={{
           height: '32px',
