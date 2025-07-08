@@ -50,6 +50,7 @@ const App = () => {
         // Shuffle the jokes array to randomize order
         const shuffledJokes = [...data].sort(() => Math.random() - 0.5);
         setJokes(shuffledJokes);
+        setLoading(false);
         console.log("API Response:", data);
 
     } catch (error) {
