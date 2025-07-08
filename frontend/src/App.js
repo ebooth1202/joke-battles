@@ -47,19 +47,11 @@ const App = () => {
         console.log("API Response:", data);
         console.log("Setting jokes to:", data);
 
-        setJokes(data);
+        // Shuffle the jokes array to randomize order
+        const shuffledJokes = [...data].sort(() => Math.random() - 0.5);
+        setJokes(shuffledJokes);
         console.log("API Response:", data);
 
-      // Mock data for now
-      // setTimeout(() => {
-      //   setJokes([
-      //     { id: 0, content: "Why don't firefighters ever get cold? Because they're always near something hot! Plus, their job really fires them up!", model: 'OpenAI' },
-      //     { id: 1, content: "What did the firefighter say when asked about his favorite music? 'I prefer anything with a good beat... and no smoke on the water!'", model: 'Anthropic' },
-      //     { id: 2, content: "How do firefighters stay in shape? They do ladder climbs and hose drills - it's the ultimate workout that's lit!", model: 'Gemini' },
-      //     { id: 3, content: "Why did the firefighter become a comedian? Because he was already used to dealing with roasts!", model: 'Llama' }
-      //   ]);
-      //   setLoading(false);
-      // }, 2000);
     } catch (error) {
       console.error('Error generating jokes:', error);
       setLoading(false);
