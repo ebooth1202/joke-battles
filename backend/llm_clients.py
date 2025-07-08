@@ -13,7 +13,7 @@ class LLMClients:
         self.openai_api_key = os.getenv("OPENAI_API_KEY")
         self.anthropic_api_key = os.getenv("ANTHROPIC_API_KEY")
         self.google_api_key = os.getenv("GOOGLE_API_KEY")  # For Gemini
-        self.ollama_base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+        self.groq_api_key = os.getenv("GROQ_API_KEY")
 
         # Create SSL context that ignores certificate verification for development
         self.ssl_context = ssl.create_default_context()
@@ -27,6 +27,8 @@ class LLMClients:
             logger.warning("ANTHROPIC_API_KEY not found in environment")
         if not self.google_api_key:
             logger.warning("GOOGLE_API_KEY not found in environment")
+        if not self.groq_api_key:
+            logger.warning("GROQ_API_KEY not found in environment")
 
     async def generate_openai_joke(self, context: str) -> str:
         """Generate joke using OpenAI GPT"""
@@ -149,38 +151,50 @@ class LLMClients:
             return "Gemini got lost in the comedy cosmos!"
 
     async def generate_llama_joke(self, context: str) -> str:
-        """Generate joke using Ollama (Llama)"""
+        """Generate joke using Groq (Llama)"""
+        groq_api_key = os.getenv("GROQ_API_KEY")
+        if not groq_api_key:
+            return "Groq API key not configured"
+
         try:
             connector = aiohttp.TCPConnector(ssl=self.ssl_context)
             async with aiohttp.ClientSession(connector=connector) as session:
+                headers = {
+                    "Authorization": f"Bearer {groq_api_key}",
+                    "Content-Type": "application/json"
+                }
+
                 data = {
-                    "model": "llama3.2",  # Using your installed model
-                    "prompt": f"Generate a single, clean, funny joke about: {context}. Keep it under 200 characters.",
-                    "stream": False,
-                    "options": {
-                        "temperature": 0.9,
-                        "num_predict": 150
-                    }
+                    "model": "llama-3.1-8b-instant",
+                    "messages": [
+                        {
+                            "role": "system",
+                            "content": "You are a comedian. Generate a single, clean, funny joke based on the user's request. Keep it under 200 characters."
+                        },
+                        {
+                            "role": "user",
+                            "content": f"Tell me {context}"
+                        }
+                    ],
+                    "max_tokens": 150,
+                    "temperature": 0.9
                 }
 
                 async with session.post(
-                        f"{self.ollama_base_url}/api/generate",
-                        json=data,
-                        timeout=aiohttp.ClientTimeout(total=30)
+                        "https://api.groq.com/openai/v1/chat/completions",
+                        headers=headers,
+                        json=data
                 ) as response:
                     if response.status == 200:
                         result = await response.json()
-                        return result["response"].strip()
+                        return result["choices"][0]["message"]["content"].strip()
                     else:
-                        logger.error(f"Ollama API error: {response.status}")
-                        return "Llama is busy grazing on comedy grass!"
+                        logger.error(f"Groq API error: {response.status}")
+                        return "Llama is busy racing through the cloud!"
 
-        except aiohttp.ClientError as e:
-            logger.error(f"Ollama connection error: {e}")
-            return "Llama wandered off from the comedy farm!"
         except Exception as e:
-            logger.error(f"Llama joke generation error: {e}")
-            return "Llama is taking a humor siesta!"
+            logger.error(f"Groq joke generation error: {e}")
+            return "Llama got lost in the speed of light!"
 
     async def test_connections(self) -> dict:
         """Test all LLM connections"""
